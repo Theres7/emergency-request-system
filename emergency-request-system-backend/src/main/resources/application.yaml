@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: emergency-request-system
+
+  datasource:
+    url: jdbc:h2:mem:emergency_db
+    driver-class-name: org.h2.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  h2:
+    console:
+      enabled: true
+    path: /h2-console
+
+  jpa:
+  database-platform: org.hibernate.dialect.H2Dialect
+  hibernate:
+    ddl-auto: update
+  show-sql: true
+  properties:
+    hibernate:
+      format_sql: true
+
+logging:
+  level:
+    root: INFO
+    com.emergency.request: TRACE
+#  file:
+#    name: logs/emergency.log
+
+server:
+  port: 9090
+
+app:
+  cors:
+    allowed-origins: ${FRONTEND_URL}
