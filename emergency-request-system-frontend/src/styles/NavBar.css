@@ -1,0 +1,28 @@
+button {
+  padding: 10px;
+}
+
+.navbar {
+  height: 70px;
+  background-color: black;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-bottom: solid #7effe7;
+
+}
+
+.nav-btn{
+  margin-right: 20px;
+}
+
+#logo{
+  height: 33px;
+  width: 150px;
+  display: block;
+  color: #0bffd2;
+  position: absolute;
+  left: 40px;
+  top: 16px;
+}
