@@ -32,9 +32,10 @@ The Emergency Request System is designed to streamline the process of submitting
 ## Backend Setup
 
 1. Navigate to the backend directory:
-   ```bash
+   
+```bash
    cd emergency-request-system-backend
-  ```
+```
 
 2. Run the application:
 
