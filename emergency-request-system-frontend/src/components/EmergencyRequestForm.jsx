@@ -24,21 +24,22 @@ function EmergencyRequestForm() {
     urgencyLevel: 5,
   });
 
-  const [selType, setSelType] = useState(0);
-  const [selUrgency, setSelUrgency] = useState(null);
+  const [selEmergencyType, setSelEmergencyType] = useState(0);
+  const [selUrgency, setSelUrgency] = useState('');
+  const [isLocationEntered, setIsLocationEntered] = useState(false);
   const [errors, setErrors] = useState({});
+
 
   const validate = () => {
     const e = {};
-    if (!selType) e.type = "Select an emergency type";
+    if (!selEmergencyType) e.type = "Select an emergency type";
     if (!selUrgency) e.urgency = "Select an urgency level";
-    if (!reporter.trim()) e.reporter = "Reporter name is required";
-    if (!contact.trim()) e.contact = "Contact number is required";
-    if (!building.trim()) e.building = "Building / zone is required";
-    if (!description.trim()) e.description = "Please describe the incident";
+    if (!formData.name.trim()) e.reporter = "Reporter name is required";
+    if (!formData.contactNumber.trim()) e.contact = "Contact number is required";
+    if (!formData.location.trim()) e.building = "Building / zone is required";
+    if (!formData.description.trim()) e.description = "Please describe the incident";
     return e;
   };
- 
 
   const EMERGENCY_TYPES = [
     {
@@ -99,7 +100,7 @@ function EmergencyRequestForm() {
 
   const URGENCY_LEVELS = [
     {
-      id: "critical",
+      id: 1,
       label: "Critical",
       desc: "Immediate life risk",
       color: "#C62828",
@@ -108,7 +109,7 @@ function EmergencyRequestForm() {
       levelScore: 10,
     },
     {
-      id: "very-high",
+      id: 2,
       label: "Very High",
       desc: "Hours to respond",
       color: "#E65100",
@@ -117,7 +118,7 @@ function EmergencyRequestForm() {
       levelScore: 9,
     },
     {
-      id: "high",
+      id: 3,
       label: "High",
       color: "#E65100",
       bg: "#FFF3E0",
@@ -125,7 +126,7 @@ function EmergencyRequestForm() {
       levelScore: 7,
     },
     {
-      id: "moderate",
+      id: 4,
       label: "Moderate",
       color: "#E65100",
       bg: "#FFF3E0",
@@ -133,7 +134,7 @@ function EmergencyRequestForm() {
       levelScore: 5,
     },
     {
-      id: "low",
+      id: 5,
       label: "Low",
       desc: "Non-dangerous",
       color: "#E65100",
@@ -161,10 +162,12 @@ function EmergencyRequestForm() {
     },
   ];
 
-  const typeObj = EMERGENCY_TYPES.find((t) => t.id === selType);
-  const sevObj = URGENCY_LEVELS.find((s) => s.id === selUrgency);
-  const isReady = selType && selUrgency;
- 
+  const emergencyTypeObj = EMERGENCY_TYPES.find((t) => t.id === selEmergencyType);
+  const urgencyLevelObj = URGENCY_LEVELS.find((s) => s.id === selUrgency);
+  // console.log(urgencyLevelObj);
+  const isReady = selEmergencyType > 0 && selUrgency > 0;
+  const isLocationDetailsReady = isReady && formData.name && formData.contactNumber && formData.location;
+
   const theme = createTheme({
     palette: {
       mode: "light",
@@ -234,7 +237,6 @@ function EmergencyRequestForm() {
     });
 
     console.log(formData.name)
-
   };
 
 
@@ -247,37 +249,41 @@ function EmergencyRequestForm() {
       emergencyType: type.typeName
     }));
 
-    setSelType(type.id); 
-    setErrors((e) => ({ 
-      ...e, type: undefined 
+    setSelEmergencyType(type.id); 
+    setErrors((prev) => ({ 
+      ...prev, 
+      type: undefined 
     })); 
-
   };
 
-
-
-  const handleUrgencyClick = (value) => {
-    console.log(value);
+  const handleUrgencyClick = (level) => {
+    console.log(level.label);
   
     setFormData((prev) => ({
       ...prev,
-      urgencyLevel: value
+      urgencyLevel: level.levelScore
     }));
-  
+
+    setSelUrgency(level.id)
     setErrors((prev) => ({
       ...prev,
-      severity: undefined
+      level: undefined
     }));
   };
 
-
-  const handlePeopleCount = (opt) => {
-    console.log(opt);
+  const handleLocation = (e) => {
+    handleChange(e);
+    setIsLocationEntered(true);
   }
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) return;
 
     try {
 
@@ -325,8 +331,8 @@ function EmergencyRequestForm() {
             py: 1.25,
             mb: 2,
             border: "2px solid",
-            borderColor: isReady ? (typeObj?.border || "divider") : "divider",
-            bgcolor: isReady ? (typeObj?.bg || "background.paper") : "background.paper",
+            borderColor: isReady ? (emergencyTypeObj?.border || "divider") : "divider",
+            bgcolor: isReady ? (emergencyTypeObj?.bg || "background.paper") : "background.paper",
             transition: "all 0.2s ease",
             borderRadius: 2,
           }}
@@ -336,19 +342,19 @@ function EmergencyRequestForm() {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              bgcolor: isReady ? typeObj?.color : "action.disabled",
+              bgcolor: isReady ? emergencyTypeObj?.color : "action.disabled",
               flexShrink: 0,
               transition: "background 0.2s",
             }}
           />
           <Typography
             variant="body2"
-            sx={{ color: isReady ? typeObj?.color : "text.secondary", fontWeight: isReady ? 500 : 400 }}
+            sx={{ color: isReady ? emergencyTypeObj?.color : "text.secondary", fontWeight: isReady ? 500 : 400 }}
           >
-            {isReady
-              ? `${typeObj.label} emergency · ${sevObj.label} urgency — ready to submit`
-              : selType
-              ? `${typeObj.label} selected — now choose a urgency level`
+              {isReady
+              ? `${emergencyTypeObj.label} emergency · ${urgencyLevelObj.label} urgency  — now enter location and contact details`
+              : selEmergencyType
+              ? `${emergencyTypeObj.label} selected — now choose a urgency level`
               : "Select an emergency type to begin"}
           </Typography>
         </Paper>
@@ -367,30 +373,25 @@ function EmergencyRequestForm() {
               <Grid item xs={4} sm={2} key={type.id}>
                 <TypeButton
                   type={type}
-                  selected={selType === type.id}
-                  // onClick={() => { setSelType(type.id); setErrors((e) => ({ ...e, type: undefined })); }}
+                  selected={selEmergencyType === type.id}
                   onClick={() => handleEmergencyType(type)}
                 />
               </Grid>
             ))}
-          </Grid> {formData.emergencyType}
+          </Grid> 
         </Paper>
  
         {/* Urgency Level */}
         <Paper elevation={0} sx={{ p: 2.5, mb: 2, border: "2px solid", borderColor: errors.severity ? "error.light" : "divider" }}>
           <SectionHeader>Urgency level</SectionHeader>
-          {errors.severity && (
-            <Alert severity="error" sx={{ mb: 1.5, py: 0.5 }}>{errors.severity}</Alert>
-          )}
+       
           <Grid container spacing={1.5} name="urgencyLevel">
             {URGENCY_LEVELS.map((level) => (
               <Grid item xs={4} key={level.id} >
                 <UrgencyButton
                   level={level} 
-                  // selected={selUrgency === level.id}
-                  selected={formData.urgencyLevel === level.levelScore}
-                  // onClick={() => { setSelUrgency(level.id); setErrors((e) => ({ ...e, severity: undefined })); }}
-                  onClick={() => handleUrgencyClick(level.levelScore)}
+                  selected={selUrgency === level.id}
+                  onClick={() => handleUrgencyClick(level)}
                 /> 
               </Grid> 
             ))}
@@ -410,6 +411,8 @@ function EmergencyRequestForm() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                error={!!errors.reporter}
+                helperText={errors.reporter}
                 placeholder="Full name"
               /> 
             </Grid>
@@ -433,13 +436,12 @@ function EmergencyRequestForm() {
                 label="Building / zone"
                 name="location"
                 value={formData.location}
-             onChange={handleChange}
+                onChange={handleLocation}
                 error={!!errors.building}
                 helperText={errors.building}
                 placeholder="e.g. Block C, Floor 2"
-              />{formData.location}
-         
-           
+              />
+ 
           </Grid>
         </Paper>
  
@@ -462,7 +464,7 @@ function EmergencyRequestForm() {
                   {AFFECTED_OPTIONS.map((affectedCountOpt) => (
                     <MenuItem key={affectedCountOpt.id} value={affectedCountOpt.value}>{affectedCountOpt.label}</MenuItem> 
                   ))} 
-                </Select> {formData.numberOfPeopleAffected} 
+                </Select>
               </FormControl>
             </Grid>         
 
@@ -479,13 +481,12 @@ function EmergencyRequestForm() {
                 error={!!errors.description}
                 helperText={errors.description}
                 placeholder="Describe what happened, current situation, and any immediate hazards…"
-              />{formData.description}
+              />
             </Grid>
         </Paper>
- 
+
         {/* Actions */}
         <Stack direction="row" spacing={1.5}>
-
           <Button
             variant="contained"
             size="large"
@@ -508,6 +509,5 @@ function EmergencyRequestForm() {
     </>
   );
 };
-
 
 export default EmergencyRequestForm;
