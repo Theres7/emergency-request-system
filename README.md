@@ -1,6 +1,6 @@
 # Emergency Request System
 
-A full-stack application for managing emergency requests efficiently. This project combines a robust backend API with a modern, responsive frontend interface.
+A Java Spring Boot - React JS full-stack application for managing emergency requests efficiently. It displays the list of all the emergency requests by priorty of the rquests - higher priority requests will be on the top. The priority score is calculated based on the type of emergency, urgency level and number of people affected. User can register request by adding necessary details on the form.
 
 ## Table of Contents
 - [Overview](#project-overview)
@@ -10,6 +10,10 @@ A full-stack application for managing emergency requests efficiently. This proje
 - [Frontend Setup](#frontend-setup)
 - [Backend Development](#backend-development)
 - [Frontend Development](#frontend-development)
+
+<img width="1464" height="875" alt="Screenshot 2026-05-03 at 11 51 34 AM" src="https://github.com/user-attachments/assets/f6fc89f4-4d51-4651-b0f6-bfe4ab6d2d37" />
+
+<img width="1464" height="687" alt="Screenshot 2026-05-03 at 11 58 52 AM" src="https://github.com/user-attachments/assets/7ed97400-46ef-4794-90d8-ca63f30b6b37" />
 
 ## Project Overview
 
